@@ -13,19 +13,18 @@
 ## Local Channel新增文件
 java/com/example/manufacturehome/
 	LocalModeActivity.java 		   :	打开本地模式
-	ClentActivity.java			   ：	本地模式通过IP添加设备界面，IP（设备IP，与手机同一局域网），port：8000
+	ClentActivity.java		   :	本地模式通过IP添加设备界面，IP（设备IP，与手机同一局域网），port：8000
 	LocalAddDeviceActivity.java	   :	本地模式通过IP添加设备
-	LocalDeviceDetailActivity.java ：	本地模式添加设备后的设备管理
+	LocalDeviceDetailActivity.java     :	本地模式添加设备后的设备管理
 	
 res/layout/
-	activity_client.xml					:	通过IP添加设备界面
+	activity_client.xml			:	通过IP添加设备界面
 	activity_local_add_device.xml		:	本地模式添加设备界面
 	activity_local_device_detail.xml	:	本地模式添加设备后的设备管理界面
 	activity_local_mode_main.xml		:	本地模式主界面
 	fragment_local_dashboard.xml		:	本地模式主界面仪表盘
-	fragment_local_home.xml				:	本地模式主界面家
+	fragment_local_home.xml			:	本地模式主界面家
 	fragment_local_notifications.xml	:	本地模式主界面提示信息
 	
 ## APK文件所在位置
 realise版：ManufactureAPP\app\release\ManufactureHome.apk
-De-bug版: ManufactureAPP\app\build\outputs\apk\debug\app-debug.apk
