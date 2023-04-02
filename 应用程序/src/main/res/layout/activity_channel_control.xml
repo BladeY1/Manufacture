@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:tooltipText="@string/prompt_username"
+    tools:context=".ChannelControlActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/mqtt_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ChannelControlActivity">
+
+            <TextView
+                android:id="@+id/mqtt_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="#FFFFFF"
+                android:text="@string/mqtt_channel"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:drawableLeftCompat="@android:drawable/presence_invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_mqtt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:onClick="onSwitchBtnClick"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/mqtt_text"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="DuplicateSpeakableTextCheck" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/zigbee_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mqtt_card">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ChannelControlActivity">
+
+            <TextView
+                android:id="@+id/zigbee_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="#FFFFFF"
+                android:text="@string/zigbee_channel"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:drawableLeftCompat="@android:drawable/presence_invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_zigbee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:onClick="onSwitchBtnClick"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/speaker_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/zigbee_card">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ChannelControlActivity">
+
+            <TextView
+                android:id="@+id/speaker_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="#FFFFFF"
+                android:text="@string/speaker_channel"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:drawableLeftCompat="@android:drawable/presence_invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_speaker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:onClick="onSwitchBtnClick"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/token_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/speaker_card">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                android:text="@string/tokenControl"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Spinner
+                android:id="@+id/user_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:spinnerMode="dropdown"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+            <Button
+                android:id="@+id/R0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:onClick="onDelTokenClick"
+                android:text="@string/R0_lightstatus_read"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/user_spinner"
+                app:layout_constraintTop_toBottomOf="@+id/textView13"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/R1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onDelTokenClick"
+                android:text="@string/R1_lightstatus_write"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/R4"
+                app:layout_constraintTop_toBottomOf="@+id/R4"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/R2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onDelTokenClick"
+                android:text="@string/R2_lightbrightness_read"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/R0"
+                app:layout_constraintTop_toBottomOf="@+id/R0"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/R3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onDelTokenClick"
+                android:text="@string/R3_lightbrightness_write"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/R1"
+                app:layout_constraintTop_toBottomOf="@+id/R1"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/R4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onDelTokenClick"
+                android:text="@string/R4_lightcolor_read"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/R2"
+                app:layout_constraintTop_toBottomOf="@+id/R2"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/R5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onDelTokenClick"
+                android:text="@string/R5_lightcolor_write"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/R3"
+                app:layout_constraintTop_toBottomOf="@+id/R3"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delToken_tip"
+                app:layout_constraintStart_toStartOf="@+id/user_spinner"
+                app:layout_constraintTop_toBottomOf="@+id/user_spinner" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/log_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:onClick="onLogBtnClick"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/token_card">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ChannelControlActivity">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/log_lookup"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

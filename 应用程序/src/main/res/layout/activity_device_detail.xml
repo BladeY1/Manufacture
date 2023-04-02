@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DeviceDetailActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="84dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/back_btn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/white"
+                android:onClick="onBackBtnClick"
+                android:src="@drawable/ic_baseline_chevron_left_48"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black" />
+
+            <ImageButton
+                android:id="@+id/device_setting"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/white"
+                android:clickable="true"
+                android:onClick="onChannelSettingBtnClick"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_baseline_settings_48"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/smart_light_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginBottom="32dp"
+            android:text="@string/smartLight"
+            android:textSize="42sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/the_light_devicedetail"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/the_light_devicedetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
+            android:clickable="true"
+            android:visibility="visible"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.6"
+            app:rippleColor="#A8C0EC">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/light_card"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/light_outline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:tintMode="src_in"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_light_svg"
+                        app:tint="@color/red" />
+
+                    <ImageView
+                        android:id="@+id/light_fill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.2"
+                        android:tintMode="src_in"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/light_fill"
+                        app:tint="@color/red" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_light"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="-48dp"
+                    android:checked="true"
+                    android:onClick="onSwitchBtnClick"
+                    app:layout_constraintBottom_toTopOf="@+id/light_card"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/light_card"
+                    app:thumbTint="@color/red"
+                    app:trackTint="@color/red" />
+
+                <TextView
+                    android:id="@+id/brightness_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20%"
+                    app:layout_constraintBottom_toBottomOf="@+id/light_card"
+                    app:layout_constraintEnd_toEndOf="@+id/light_card"
+                    app:layout_constraintStart_toStartOf="@+id/light_card"
+                    app:layout_constraintTop_toTopOf="@+id/light_card"
+                    app:layout_constraintVertical_bias="0.75" />
+
+                <ImageButton
+                    android:id="@+id/bright_up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginBottom="-100dp"
+                    android:background="#00FFFFFF"
+                    android:onClick="onBrightnessClick"
+                    app:layout_constraintBottom_toTopOf="@+id/light_card"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:srcCompat="@drawable/ic_baseline_arrow_drop_up_48"
+                    app:tint="@color/red" />
+
+                <ImageButton
+                    android:id="@+id/bright_down"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:alpha="0.5"
+                    android:background="#00FFFFFF"
+                    android:onClick="onBrightnessClick"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/bright_up"
+                    app:srcCompat="@drawable/ic_baseline_arrow_drop_down_48"
+                    app:tint="@color/red" />
+
+                <Button
+                    android:id="@+id/to_red_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/red"
+                    android:onClick="onColorSwitchClick"
+                    app:layout_constraintEnd_toStartOf="@+id/to_yellow_btn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/light_card" />
+
+                <Button
+                    android:id="@+id/to_yellow_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/yellow"
+                    android:onClick="onColorSwitchClick"
+                    app:layout_constraintEnd_toStartOf="@+id/to_green_btn"
+                    app:layout_constraintStart_toEndOf="@+id/to_red_btn"
+                    app:layout_constraintTop_toBottomOf="@+id/light_card" />
+
+                <Button
+                    android:id="@+id/to_green_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/green"
+                    android:onClick="onColorSwitchClick"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/to_yellow_btn"
+                    app:layout_constraintTop_toBottomOf="@+id/light_card" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

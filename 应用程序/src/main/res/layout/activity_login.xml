@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+
+    <Button
+        android:id="@+id/local_mode_btn"
+        android:layout_width="139dp"
+        android:layout_height="75dp"
+        android:layout_gravity="start"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="500dp"
+        android:drawableTop="@drawable/ic_baseline_local_mode_24"
+        android:enabled="true"
+        android:onClick="onLocalModeClick"
+        android:text="@string/title_local_mode"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:typeface="serif"
+        app:cornerRadius="56dp"
+        style="?android:attr/borderlessButtonStyle"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="152dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/smarthome" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="380dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="-40dp"
+        app:cardCornerRadius="36dp"
+        app:cardElevation="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="#A8C0EC"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:id="@+id/getStarted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:text="@string/getStarted"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/servreurl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:layout_marginEnd="48dp"
+                android:alpha="0.2"
+                android:minHeight="48dp"
+                android:selectAllOnFocus="true"
+                android:text="https://101.43.239.148"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:layout_marginEnd="48dp"
+                android:autofillHints="@string/prompt_username"
+                android:hint="@string/prompt_username"
+                android:inputType="textEmailAddress"
+                android:minHeight="48dp"
+                android:selectAllOnFocus="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/getStarted" />
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:layout_marginEnd="48dp"
+                android:autofillHints="@string/prompt_password"
+                android:hint="@string/prompt_password"
+                android:imeActionLabel="@string/action_login"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword"
+                android:minHeight="48dp"
+                android:selectAllOnFocus="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/username" />
+
+            <Button
+                android:id="@+id/login"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="64dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="64dp"
+                android:enabled="true"
+                android:onClick="onLoginClick"
+                android:text="@string/action_login"
+                android:textSize="16sp"
+                app:cornerRadius="56dp"
+                app:layout_constraintEnd_toStartOf="@+id/reg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/password" />
+
+            <Button
+                android:id="@+id/reg"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="64dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="64dp"
+                android:enabled="true"
+                android:onClick="onRegClick"
+                android:text="@string/action_reg"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:cornerRadius="56dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/login"
+                app:layout_constraintTop_toBottomOf="@+id/password" />
+
+            <ProgressBar
+                android:id="@+id/loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/password"
+                tools:visibility="gone" />
+
+            <TextView
+                android:id="@+id/reglogswitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="108dp"
+                android:clickable="true"
+                android:minHeight="48dp"
+                android:onClick="switchRegLog"
+                android:text="@string/no_account_reg"
+                android:textAllCaps="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/password" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
