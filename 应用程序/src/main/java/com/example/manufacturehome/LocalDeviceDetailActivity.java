@@ -174,7 +174,7 @@ public class LocalDeviceDetailActivity extends AppCompatActivity {
                     });
                     break;
                 case "suc":
-                    // 操作请求处理成功
+                    // 操作请求处理成功,再发一次读操作更新Data
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -182,6 +182,11 @@ public class LocalDeviceDetailActivity extends AppCompatActivity {
                         }
                     });
                     System.out.printf("接收：%s%n",responseText);
+                    String R="4";
+                    String Param="0";//0为开
+                    String token = "LocalModeChannel_2023_03_17_0000";
+                    sendDataAsync(R, Param, token);
+                    receiveData();
                     break;
                 case "lon":
                     // 处于打开状态
