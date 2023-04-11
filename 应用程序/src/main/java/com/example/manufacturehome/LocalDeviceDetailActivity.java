@@ -1,3 +1,4 @@
+
 package com.example.manufacturehome;
 
 import android.content.Intent;
@@ -14,15 +15,17 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.example.manufacturehome.databinding.ActivityDeviceDetailBinding;
 import com.example.manufacturehome.databinding.ActivityLocalDeviceDetailBinding;
 import com.example.manufacturehome.utils.Data;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Timer;
@@ -31,8 +34,6 @@ import java.util.TimerTask;
 
 public class LocalDeviceDetailActivity extends AppCompatActivity {
     private ActivityLocalDeviceDetailBinding binding;
-    private Timer updateLightTimer;
-    private Socket socket;
     private SocketThread socketThread;
 
     static final int CONNECT_TIMEOUT = 5000; // 5秒钟超时
@@ -73,310 +74,208 @@ public class LocalDeviceDetailActivity extends AppCompatActivity {
         binding = ActivityLocalDeviceDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // 创建Socket对象
-        new CreateSocketTask(dstAddress, dstPort).execute();
+        // Connect to the server
+        socketThread = new SocketThread(dstAddress, dstPort);
+        socketThread.start();
 
-        updateLightTimer = new Timer();
-        updateLightTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                LocalDeviceDetailActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUIFromData();
-                    }
-                });
-            }
-        }, 0, 400);
     }
 
-    private class CreateSocketTask extends AsyncTask<Void, Void, Socket> {
-        private String dstAddress;
-        private int dstPort;
+    private class SocketThread extends Thread {
 
-        public CreateSocketTask(String address, int port) {
-            dstAddress = address;
-            dstPort = port;
-        }
-
-        @Override
-        protected Socket doInBackground(Void... voids) {
-            Socket socket = null;
-            try {
-                socket = new Socket(dstAddress, dstPort);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return socket;
-        }
-
-        @Override
-        protected void onPostExecute(Socket result) {
-            socket = result;
-            // 创建Handler并传递给SocketThread
-            Handler handler = new Handler(Looper.getMainLooper());
-            updateData(handler);
-        }
-    }
-
-    public interface Callback {
-        void onFailure(String message);
-
-        void onSuccess(String result);
-
-        void onError(String error);
-    }
-
-    public class SocketThread implements Runnable {
         private Socket socket;
-        private String R;
-        private final String  Param;
-        private Callback callback;
-        private boolean isRunning = false;
+        private BufferedReader input;
+        private PrintWriter output;
+        private String serverIP;
+        private int serverPort;
 
-        private BufferedReader reader;
-        private BufferedWriter writer;
-
-        public SocketThread(Socket socket, String R, String param, Callback callback) {
-            this.socket = socket;
-            this.callback = callback;
-            this.R = R;
-            this.Param = param;
-            try {
-                // 初始化BufferedReader和BufferedWriter对象
-                this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public boolean isRunning() {
-            return isRunning;
-        }
-
-        private final Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message message) {
-                if (message != null && message.obj instanceof String) {
-                    String response = (String) message.obj;
-                    if (response.startsWith("suc")) {
-                        if (response.length() >= 5) {
-                            callback.onSuccess(response.substring(4));
-                        } else {
-                            callback.onFailure("Invalid response from server: " + response);
-                        }
-                    } else if (response.startsWith("err")) {
-                        if (response.length() >= 5) {
-                            callback.onError(response.substring(4));
-                        } else {
-                            callback.onFailure("Invalid response from server: " + response);
-                        }
-                    } else if (response.equals("lon\n")) {
-                        callback.onFailure("The device is already on");
-                    } else if (response.equals("lof\n")) {
-                        callback.onFailure("The device is already off");
-                    } else if (response.equals("ntf\n")) {
-                        callback.onFailure("Unknown error occurred");
-                    } else {
-                        try {
-                            int code = Integer.parseInt(response.trim());
-                            if (code >= 0) {
-                                callback.onSuccess(response);
-                            } else {
-                                callback.onFailure("Server returned error code: " + code);
-                            }
-                        } catch (NumberFormatException e) {
-                            callback.onFailure("Invalid response from server: " + response);
-                        }
-                    }
-                } else {
-                    callback.onFailure("Unknown error occurred");
-                }
-                return true;
-            }
-        });
-
-        public Socket getSocket() {
-            return socket;
-        }
-
-        public boolean isConnected() {
-            return socket != null && socket.isConnected();
-        }
-
-        public String receiveData() throws IOException {
-            String response = null;
-            if (reader != null) {
-                response = reader.readLine();
-            }
-            return response;
-        }
-
-        public void cancel() {
-            isRunning = false;
-            try {
-                if( socket != null ) {
-                    // 关闭套接字
-                    socket.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        SocketThread(String serverIP, int serverPort) {
+            this.serverIP = serverIP;
+            this.serverPort = serverPort;
         }
 
         @Override
         public void run() {
-            isRunning = true;
             try {
-                if (!socket.isConnected()) {
-                    // 如果套接字未连接，则连接服务器
-                    socket.connect(new InetSocketAddress(dstAddress, dstPort), CONNECT_TIMEOUT);
+                socket = new Socket(serverIP, serverPort);
+                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                output = new PrintWriter(socket.getOutputStream(), true);
 
-                    // 创建 BufferedReader 和 BufferedWriter
-                    reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+//                StringBuilder requestData = new StringBuilder();
+//                requestData.append("R");
+//                requestData.append("Param");
+//                requestData.append("token");
+//
+//                String requestDataString = requestData.toString();
+//                socketThread.output.println(requestDataString);
+                while (!socket.isClosed()) {
+                    receiveData();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateUIFromData();
+                        }
+                    });
                 }
-
-                // 向服务器发送数据包,格式："R" + "Param" + "Token"
-                String data = "R" + "Param" + "Token";
-                writer.write(data);
-                writer.newLine();
-                writer.flush();
-
-                // 接收服务器返回的数据
-                String response = reader.readLine();
-
-                if (isRunning && callback != null) {
-                    Message message = new Message();
-                    message.obj = response;
-                    handler.sendMessage(message);
-                }
-            } catch (IOException e) {
-                if (isRunning && callback != null) {
-                    callback.onFailure(e.getMessage());
-                }
-            } catch (Exception e) {
-                if (isRunning && callback != null) {
-                    callback.onFailure(e.getMessage());
-                }
-            } finally {
-                isRunning = false;
-            }
-        }
-    }
-
-    private class SendDataTask extends AsyncTask<Void, Void, String> {
-        private String R;
-        private String Param;
-        private String token;
-        private SocketThread socketThread;
-
-        public SendDataTask(SocketThread socketThread, String R, String Param, String token) {
-            this.socketThread = socketThread;
-            this.R = R;
-            this.Param = Param;
-            this.token = token;
-        }
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                if (!socketThread.isConnected()) {
-                    // 如果套接字未连接，则连接服务器
-                    socketThread.getSocket().connect(new InetSocketAddress(dstAddress, dstPort), CONNECT_TIMEOUT);
-
-                    // 创建 BufferedReader 和 BufferedWriter
-                    socketThread.reader = new BufferedReader(new InputStreamReader(socketThread.getSocket().getInputStream()));
-                    socketThread.writer = new BufferedWriter(new OutputStreamWriter(socketThread.getSocket().getOutputStream()));
-                }
-
-                // 向服务器发送数据包
-                String message = R + Param + token;
-                socketThread.writer.write(message);
-                socketThread.writer.newLine();
-                socketThread.writer.flush();
-
-                // 接收服务器返回的数据
-                String response = socketThread.reader.readLine();
-                return response;
             } catch (Exception e) {
                 e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String response) {
-            if (socketThread.isRunning() && socketThread.callback != null) {
-                if (response != null) {
-                    // 将服务器返回的数据传递给回调方法
-                    socketThread.callback.onSuccess(response);
-                } else {
-                    socketThread.callback.onFailure("Failed to send data to server");
-                }
             }
         }
     }
 
     private void sendData(final String R, String Param, String token) {
-        new SendDataTask(socketThread, R, Param, token).execute();
+        try {
+            StringBuilder requestData = new StringBuilder();
+            requestData.append(R);
+            requestData.append(Param);
+            requestData.append(token);
+
+            String requestDataString = requestData.toString();
+            socketThread.output.println(requestDataString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    private void sendDataAsync(final String R, final String Param, final String token) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sendData(R, Param, token);
+            }
+        }).start();
+    }
+
+    private void receiveData() {
+        try {
+            String responseText = socketThread.input.readLine();
+            String res_brightness = "60";
+
+            if (responseText == null) {
+                return;
+            }
+
+            switch (responseText.trim()) {
+                case "ntf":
+                    // 未知错误
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LocalDeviceDetailActivity.this, "Unknown error.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    break;
+                case "err":
+                    // 操作请求处理出错
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LocalDeviceDetailActivity.this, "Error processing the operation request.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    break;
+                case "suc":
+                    // 操作请求处理成功
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LocalDeviceDetailActivity.this, "Operation request processed successfully.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    System.out.printf("接收：%s%n",responseText);
+                    break;
+                case "lon":
+                    // 处于打开状态
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LocalDeviceDetailActivity.this, "The light is on.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Data.Light_Color = "red";
+                    Data.Light_Status = true;
+                    Data.Light_Brightness = Float.parseFloat("0." + res_brightness);
+                    break;
+                case "lof":
+                    // 处于关闭状态
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LocalDeviceDetailActivity.this, "The light is off.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Data.Light_Color = "grey";
+                    Data.Light_Status = false;
+                    Data.Light_Brightness = 0f;
+                    break;
+                case "lrd":
+                    Data.Light_Color = "red";
+                    Data.Light_Status = true;
+                    Data.Light_Brightness = Float.parseFloat("0." + res_brightness);
+                    break;
+                case "lyl":
+                    Data.Light_Color = "yellow";
+                    Data.Light_Status = true;
+                    Data.Light_Brightness = Float.parseFloat("0." + res_brightness);
+                    break;
+                case "lgn":
+                    Data.Light_Color = "green";
+                    Data.Light_Status = true;
+                    Data.Light_Brightness = Float.parseFloat("0." + res_brightness);
+                    break;
+                default:
+                    int responseCode = Integer.parseInt(responseText.trim());
+                    handleResponseCode(responseCode);
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleResponseCode(final int responseCode) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch (responseCode) {
+                    case 200:
+                        // Success
+                        Toast.makeText(LocalDeviceDetailActivity.this, "The operation request processed successfully.", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 404:
+                        // Requested resource does not exist
+                        Toast.makeText(LocalDeviceDetailActivity.this, "The requested resource does not exist.", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 500:
+                        // Internal server error
+                        Toast.makeText(LocalDeviceDetailActivity.this, "Internal server error.", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        // Other errors
+                        Toast.makeText(LocalDeviceDetailActivity.this, "Error occurred: " + responseCode, Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(socket!=null)
-        {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            if (socketThread.socket != null) {
+                socketThread.socket.close();
             }
-        }
-        // 当Activity销毁时，关闭SocketThread
-        if (socketThread != null) {
-            socketThread.cancel();
-            while (socketThread.isRunning()) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            if (socketThread.input != null) {
+                socketThread.input.close();
             }
-            socketThread = null;
+            if (socketThread.output != null) {
+                socketThread.output.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-
-    public void onSwitchBtnClick(View view){
-        onSwitchLight((CompoundButton)view,((CompoundButton)view).isChecked());
-    }
-
-    private void onSwitchLight(CompoundButton buttonView, boolean isChecked) {
-        String R="1";
-        String Param=isChecked?"0":"1";//0为开1为关
-
-        //这个token包含一个描述性前缀“LocalModeChannel”来表示本地模式通道，接着是当前日期（年、月、日）
-        //最后是4位数字（可以将其视为一个版本号或其他标识符, 未来使用）。
-        String token = "LocalModeChannel_2023_03_17_0000";
-        sendData(R, Param, token);
-    }
-
-    public void onBrightnessClick(View view) {
-        final String Param;
-        if (view.getId() == R.id.bright_up) {
-            Param = "0"; //+20
-        } else if (view.getId() == R.id.bright_down) {
-            Param = "1"; //-20
-        } else {
-            return; // handle invalid view id
-        }
-        String R="3";
-        String token = "LocalModeChannel_2023_03_17_0000";
-        sendData(R, Param, token);
-    }
 
 
     public void updateUIFromData(){
@@ -418,153 +317,34 @@ public class LocalDeviceDetailActivity extends AppCompatActivity {
     }
 
 
-    public void updateData(Handler handler){
-        // 判断SocketThread对象是否存在并且其socket对象是否已经连接，如果已经断开连接，就不需要再接收信息
-        if (socketThread != null && socketThread.isConnected()) {
-            return;
+    public void onSwitchBtnClick(View view){
+        onSwitchLight((CompoundButton)view,((CompoundButton)view).isChecked());
+    }
+
+    private void onSwitchLight(CompoundButton buttonView, boolean isChecked) {
+        String R="1";
+        String Param=isChecked?"0":"1";//0为开1为关
+
+        //这个token包含一个描述性前缀“LocalModeChannel”来表示本地模式通道，接着是当前日期（年、月、日）
+        //最后是4位数字（可以将其视为一个版本号或其他标识符, 未来使用）。
+        String token = "LocalModeChannel_2023_03_17_0000";
+        //sendData(R, Param, token);
+        sendDataAsync(R, Param, token);
+    }
+
+    public void onBrightnessClick(View view) {
+        final String Param;
+        if (view.getId() == R.id.bright_up) {
+            Param = "0"; //+20
+        } else if (view.getId() == R.id.bright_down) {
+            Param = "1"; //-20
+        } else {
+            return; // handle invalid view id
         }
-
-        // 创建SocketThread并启动
-        socketThread = new SocketThread(socket, "R","Param" ,  new Callback() {
-            @Override
-            public void onFailure(String message) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 在UI线程中显示错误消息
-                        Toast.makeText(LocalDeviceDetailActivity.this, message, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onSuccess(String result) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 在UI线程中显示成功消息
-                        Toast.makeText(LocalDeviceDetailActivity.this, result, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 在UI线程中显示错误消息
-                        Toast.makeText(LocalDeviceDetailActivity.this, error, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-        Thread thread = new Thread(socketThread);
-        thread.start();
-
-        // 使用定时器在一定时间间隔内循环接收服务器返回的信息
-        Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    // 判断SocketThread对象是否存在并且其socket对象是否已经连接，如果已经断开连接，就不需要再接收信息
-                    if (socketThread == null || socketThread.getSocket() == null || socketThread.getSocket().isClosed()) {
-                        timer.cancel();
-                        return;
-                    }
-
-                    // 接收服务器返回的信息
-                    String responseText = socketThread.receiveData();
-
-                    // 检查 responseText 是否为空
-                    if (responseText == null) {
-                        return;
-                    }
-                    // 根据返回的信息进行处理
-                    switch (responseText.trim()) {
-                        case "ntf":
-                            // 未知错误
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LocalDeviceDetailActivity.this, "Unknown error.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            break;
-                        case "err":
-                            // 操作请求处理出错
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LocalDeviceDetailActivity.this, "Error processing the operation request.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            break;
-                        case "suc":
-                            // 操作请求处理成功
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LocalDeviceDetailActivity.this, "Operation request processed successfully.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            break;
-                        case "lon":
-                            // 已经处于打开状态，无需执行该操作
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LocalDeviceDetailActivity.this, "The light is already on.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            break;
-                        case "lof":
-                            // 已经处于关闭状态，无需执行该操作
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LocalDeviceDetailActivity.this, "The light is already off.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            break;
-                        default:
-                            // 其他情况下，返回一个数字，数字表示操作请求处理的结果代码
-                            final int responseCode = Integer.parseInt(responseText.trim());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    switch (responseCode) {
-                                        case 200:
-                                            // 处理成功
-                                            Toast.makeText(LocalDeviceDetailActivity.this, "The operation request processed successfully.", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        case 404:
-                                            // 请求的资源不存在
-                                            Toast.makeText(LocalDeviceDetailActivity.this, "The requested resource does not exist.", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        case 500:
-                                            // 服务器内部错误
-                                            Toast.makeText(LocalDeviceDetailActivity.this, "Internal server error.", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        default:
-                                            // 其他错误
-                                            Toast.makeText(LocalDeviceDetailActivity.this, "Error occurred: " + responseCode, Toast.LENGTH_SHORT).show();
-                                            break;
-                                    }
-                                }
-                            });
-                            break;
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        // 每400毫秒执行一次任务
-        timer.schedule(timerTask, 0, 400);
+        String R="3";
+        String token = "LocalModeChannel_2023_03_17_0000";
+        //sendData(R, Param, token);
+        sendDataAsync(R, Param, token);
     }
 
     public void onColorSwitchClick(View view){
@@ -585,32 +365,20 @@ public class LocalDeviceDetailActivity extends AppCompatActivity {
 
         String R="5";
         String token = "LocalModeChannel_2023_03_17_0000";
-        sendData(R, Param, token);
+        //sendData(R, Param, token);
+        sendDataAsync(R, Param, token);
     }
 
     public void onBackBtnClick(View view){
         Intent intent = new Intent(LocalDeviceDetailActivity.this, LocalModeActivity.class);
         startActivity(intent);
-        if (updateLightTimer != null) {
-            updateLightTimer.cancel();
-        }
         finish();
     }
-//    public void onChannelSettingBtnClick(View view){
-//        Intent intent = new Intent(LocalDeviceDetailActivity.this, LocalChannelControlActivity.class);
-//        startActivity(intent);
-//        if (updateLightTimer != null) {
-//            updateLightTimer.cancel();
-//        }
-//        finish();
-//    }
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(LocalDeviceDetailActivity.this, LocalModeActivity.class);
         startActivity(intent);
-        if (updateLightTimer != null) {
-            updateLightTimer.cancel();
-        }
         finish();
     }
 }
